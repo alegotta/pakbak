@@ -6,7 +6,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -37,18 +37,19 @@ done
 
 
 # make the backup before cleaning up old ones in case the backup fails
+pacman -Qqtt > "$target_folder/pakbak-packages-$(date +%Y-%m-%d-%H%M%S).txt" || exit $?
 tar -cJf "$target_folder/pakbak-$(date +%Y-%m-%d-%H%M%S).tar.xz" "/var/lib/pacman/local" || exit $?
 
 # cleanup old files
 if [ -n "$keep_days" ]; then
-    find -H "$target_folder" -name 'pakbak-*.tar.xz' -type f -mtime +$keep_days -exec rm -v {} +
+    find -H "$target_folder" -name 'pakbak-*' -type f -mtime +$keep_days -exec rm -v {} +
 fi;
 
 # cleanup files if there is too many of them (more than $keep_number)
 if [ -n "$keep_number" ]; then
     # Increment keep_number for correct tail handling
     let keep_number=$keep_number+1
-    FILES_TO_DELETE=$(find -H "$target_folder" -name 'pakbak-*.tar.xz' -type f -print0 | \
+    FILES_TO_DELETE=$(find -H "$target_folder" -name 'pakbak-*' -type f -print0 | \
                         xargs -0 stat --format "%Y %n" | \
                         sort -rn | \
                         cut -d' ' -f2- | \
